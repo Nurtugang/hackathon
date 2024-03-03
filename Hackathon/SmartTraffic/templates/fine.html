@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+{% endblock head %}
+
+{% block content %}
+
+<div class="list-group">
+  <a href="#" class="list-group-item list-group-item-action list-group-item-primary">
+    <h1>Загрузка видеоматериала</h1>
+    <div>
+        <form method = "POST", enctype="multipart/form-data">
+           {% csrf_token %}
+           {{ form.as_p }}
+           <button type="submit">Отправить</button>
+        </form>
+    </div>
+</a>
+  <a href="#" class="list-group-item list-group-item-action list-group-item-light">
+      <div>
+    <h1>Непроверенные штрафы</h1>
+    <table class="table table-sm">
+      <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Водитель</th>
+            <th scope="col">Вид ТС</th>
+            <th scope="col">Штраф</th>
+            <th scope="col">Госномер</th>
+            <th scope="col">Статус</th>
+        </tr>
+      </thead>
+    <tbody>
+    {% for t in tablepo %}
+        <tr class='clickable-row' data-href='#'>
+            <td scope="col">{{ t.pk }}</td>
+            <td scope="col">{{ t.driver.name}} {{t.driver.surname}}</td>
+            {% if t.driver.vehicle == 'car' %}
+                <td scope="col">Легковое авто</td>
+            {% elif t.driver.vehicle == 'bus' %}
+                <td scope="col">Автобус</td>
+            {% elif t.driver.vehicle == 'truck' %}
+                <td scope="col">Грузовой</td>
+            {% endif %}
+            <td scope="col">{{ t.speed }} км/ч</td>
+            <td scope="col">{{ t.driver.number }}</td>
+            <!-- <td scope="col"><img height="200" width="300" src="{{ t.accident_img.url }}" alt="img"></td> -->
+            {% if t.valid == True %}
+                <td scope="col">Оштрафован</td>
+            {% elif t.valid == False %}
+                <td scope="col">Отказан</td>
+            {% endif %}
+            <td scope="col"><a href="{{t.get_absolute_url}}" class="button btn btn-info">Перейти</a></td>
+
+
+       </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+    </div>
+  </a>
+   <a href="#" class="list-group-item list-group-item-action list-group-item-success">
+       <div>
+    <h1>Проверенные штрафы</h1>
+<table class="table table-sm">
+      <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Водитель</th>
+            <th scope="col">Вид ТС</th>
+            <th scope="col">Штраф</th>
+            <th scope="col">Госномер</th>
+            <th scope="col">Статус</th>
+        </tr>
+      </thead>
+    <tbody>
+    {% for t in validpo %}
+        <tr class='clickable-row' data-href='#'>
+            <td scope="col">{{ t.pk }}</td>
+            <td scope="col">{{ t.driver.name}} {{t.driver.surname}}</td>
+            {% if t.driver.vehicle == 'car' %}
+                <td scope="col">Легковое авто</td>
+            {% elif t.driver.vehicle == 'bus' %}
+                <td scope="col">Автобус</td>
+            {% elif t.driver.vehicle == 'truck' %}
+                <td scope="col">Грузовой</td>
+            {% endif %}
+            <td scope="col">{{ t.speed }} км/ч</td>
+            <td scope="col">{{ t.driver.number }}</td>
+
+            <!-- <td scope="col"><img height="200" width="300" src="{{ t.accident_img.url }}" alt="img"></td> -->
+            {% if t.valid == True %}
+                <td scope="col">Оштрафован</td>
+            {% elif t.valid == False %}
+                <td scope="col">Отказан</td>
+            {% endif %}
+            <td scope="col"><a href="{{t.get_absolute_url}}" class="button btn btn-info">Перейти</a></td>
+
+       </tr>
+    {% endfor %}
+  </tbody>
+</table>
+    </div>
+   </a>
+</div>
+
+
+
+<script>
+    jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
+</script>
+{% endblock content %}

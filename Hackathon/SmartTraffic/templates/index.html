@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+{% endblock head %}
+
+{% block content %}
+<div class="row">
+  <div class="col">
+  	<div>
+        <img src="{% url 'index' %}">
+    </div>
+  	<form method = "POST", enctype="multipart/form-data">
+   {% csrf_token %}
+   {{ form.as_p }}
+   <button type="submit">Отправить</button>
+</form>
+  </div>
+  <div class="col">
+  	<h4>Светофор. Направление юг-север</h4>
+  	<div id="traffic-signal">
+        <div id="green"></div>
+        <div id="yellow"></div>
+        <div id="red"></div>
+   </div>
+  	<h4>Светофор. Направление запад-восток</h4>
+    <div id="traffic-signal2">
+        <div id="green2"></div>
+        <div id="yellow2"></div>
+        <div id="red2"></div>
+    </div>
+
+  	<h3>Количество машин</h3>
+  	<table class="table table-bordered table-sm">
+    <thead>
+      <tr>
+        <th>Слева</th>
+        <th>Справа</th>
+        <th>Сверху</th>
+        <th>Снизу</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+      </tr>
+    </tbody>
+  </table>
+  	<div class="justify-content-end">
+  <canvas id="myChart"></canvas>
+</div>
+  </div>
+</div>
+	
+
+
+<script>
+	function startTrafficSignal () {
+    var green=document.getElementById("green");
+    var red=document.getElementById("red");
+    var yellow=document.getElementById("yellow");
+ 
+    green.style.opacity=1;
+    setTimeout(function () {
+        green.style.opacity=.3;
+        red.style.opacity=.3;
+        yellow.style.opacity=1;
+    },5000);
+ 
+    setTimeout(function () {
+        green.style.opacity=.3;
+        red.style.opacity=1;
+        yellow.style.opacity=.3;
+    },7000);
+ 
+    setTimeout(function () {
+        green.style.opacity=1;
+        red.style.opacity=.3;
+        yellow.style.opacity=.3;
+    },12000);
+}
+ 
+var timer=setInterval(function () {
+    startTrafficSignal();
+},12000);
+ 
+startTrafficSignal();
+function startTrafficSignal2 () {
+    var green=document.getElementById("green2");
+    var red=document.getElementById("red2");
+    var yellow=document.getElementById("yellow2");
+ 
+    green.style.opacity=1;
+    setTimeout(function () {
+        green.style.opacity=.3;
+        red.style.opacity=.3;
+        yellow.style.opacity=1;
+    },5000);
+ 
+    setTimeout(function () {
+        green.style.opacity=.3;
+        red.style.opacity=1;
+        yellow.style.opacity=.3;
+    },7000);
+ 
+    setTimeout(function () {
+        green.style.opacity=1;
+        red.style.opacity=.3;
+        yellow.style.opacity=.3;
+    },12000);
+}
+ 
+var timer2=setInterval(function () {
+    startTrafficSignal2();
+},12000);
+ 
+startTrafficSignal2();
+</script>
+<script>
+  var ctx = document.getElementById('myChart');
+  var graphData = {
+    type: 'bar',
+    data: {
+      labels: ['Направление Юг-Север           ','Направление Восток-Запад', ],
+      datasets: [{
+        label: 'кол-во машин',
+        data: [1],
+        backgroundColor: [
+        	'rgba(73, 198, 230, 0.5)',
+        ],
+        borderWidth: 1
+      },
+      // {
+      //   label: 'кол-во машин',
+      //   data: [1],
+      //   backgroundColor: [
+      //   	'rgba(73, 198, 230, 0.5)',
+      //   ],
+      //   borderWidth: 1
+      // }
+      ]
+    },
+    options: {
+    	responsive: true,
+    	// indexAxis: 'y',
+    }
+  }
+  var myChart = new Chart(ctx, graphData);
+	var socket = new WebSocket('ws://localhost:8000/ws/SmartTraffic/')
+	socket.onmessage = function(e){
+		var djangoData = JSON.parse(e.data);
+		console.log(djangoData.yy)
+    var newGraphData = [graphData.data.datasets[0].data[1], djangoData.yy[0]];
+    graphData.data.datasets[0].data = newGraphData;
+    myChart.update();
+		// var newGraphData = graphData.data.datasets[0].data;
+		// var newGraphData2 = graphData.data.datasets[1].data;
+		// newGraphData.push(djangoData.yy[0]);
+		// newGraphData2.push(djangoData.yy[1]);
+		// newGraphData.shift()
+		// newGraphData2.shift()
+		// graphData.data.datasets[0].data = newGraphData;
+		// graphData.data.datasets[1].data = newGraphData2;
+		// myChart.update();
+	}
+</script>
+{% endblock content %}

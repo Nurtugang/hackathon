@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
+{% endblock head %}
+
+{% block content %}
+<div class="row">
+  <div class="col">
+      <div class="list-group">
+  <a href="#" class="list-group-item list-group-item-action list-group-item-primary">
+    {{my_fine.driver.name}} {{my_fine.driver.surname}}
+  </a>
+  <a href="#" class="list-group-item list-group-item-action list-group-item-light">
+      При подтверждении штрафа на почту водителя({{my_fine.driver.email}}) будет отправлено письмо
+  </a>
+  <a href="#" class="list-group-item list-group-item-action list-group-item-light">
+      Вид транспорта: {{my_fine.driver.vehicle}}
+  </a>
+  <a href="#" class="list-group-item list-group-item-action list-group-item-danger">
+      Совершенное нарушение: Превышение скорости на {{speed_addon}} км.ч выше дозволенного({{my_fine.speed}} км.ч) 
+  </a>
+  <a href="#" class="list-group-item list-group-item-action list-group-item-light">
+      Время предположительно совершенного нарушения: {{my_fine.fine_date|date:'Y-m-d H:i'}}
+  </a>
+</div>
+{% if my_fine.check == False %}
+<div>
+    <br>
+    <form action="{% url 'concrete_fine' my_fine.id %}" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="button btn btn-info">Принять</button>
+    </form>
+</div>
+{% endif %}
+{% if my_fine.valid == True %}
+    <a href="#" class="list-group-item list-group-item-action list-group-item-danger">
+      Водитель уже был оштрафован
+  </a>
+{% endif %}
+
+<div>
+    <br>
+    <a href="{% url 'fine' %}" class="button btn btn-info">Назад</a>
+    
+</div>
+  </div>
+  <div class="col">
+      <img height="400" width="600" src="{{ my_fine.accident_img.url }}" alt="img">
+      <img height="400" width="600" src="{{ my_fine.number_img.url }}" alt="img">
+  </div>
+</div>
+
+{% endblock content %}
